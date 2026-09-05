@@ -1,219 +1,188 @@
-<template>
-  <div class="app-container">
-    <!-- 自定义标题栏 -->
-    <div class="titlebar">
-      <span class="titlebar-title">QQ经典农场助手</span>
-    </div>
+<script setup lang="ts">
+import type { Theme } from '@/stores/app'
+import { onMounted } from 'vue'
+import { RouterView } from 'vue-router'
+import ToastContainer from '@/components/ToastContainer.vue'
+import { useAppStore } from '@/stores/app'
 
-    <!-- 主体区域 -->
-    <div class="main-layout">
-      <!-- 左侧导航 -->
-      <div class="sidebar">
-        <div class="nav-items">
-          <div
-            v-for="item in navItems"
-            :key="item.path"
-            class="nav-item"
-            :class="{ active: isRouteActive(item.path) }"
-            @click="router.push(item.path)"
-            :title="item.label"
-          >
-            <div class="nav-icon-wrapper">
-              <span class="nav-icon">{{ item.icon }}</span>
-              <div v-if="item.badge > 0" class="nav-badge"></div>
-            </div>
-          </div>
-        </div>
-        <div class="sidebar-bottom">
-          <div class="status-dot" :class="statusClass" :title="statusText"></div>
-        </div>
-      </div>
+const appStore = useAppStore()
 
-      <!-- 右侧内容 -->
-      <div class="content">
-        <router-view />
-      </div>
-    </div>
-  </div>
-</template>
-
-<script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useBot } from '@/composables/useBot'
-
-const route = useRoute()
-const router = useRouter()
-const { getNotifications } = useBot()
-
-const connected = ref(false)
-const unreadCount = ref(0)
-
-const navItems = computed(() => [
-  { path: '/', icon: '🏠', label: '首页' },
-  { path: '/lands', icon: '🌱', label: '土地' },
-  { path: '/friends', icon: '👥', label: '好友' },
-  { path: '/tasks', icon: '✅', label: '任务' },
-  { path: '/limits', icon: '⛔', label: '限制' },
-  { path: '/analytics', icon: '📊', label: '分析' },
-  { path: '/notifications', icon: '🔔', label: '通知', badge: unreadCount.value },
-  { path: '/settings', icon: '⚙️', label: '设置' },
-  { path: '/logs', icon: '📜', label: '日志' },
-])
-
-const statusClass = computed(() => (connected.value ? 'online' : 'offline'))
-const statusText = computed(() => (connected.value ? '在线' : '离线'))
-
-function isRouteActive(path) {
-  if (path === '/') return route.path === '/'
-  return route.path.startsWith(path)
+// 立即应用保存的主题（在组件挂载前）
+const savedTheme = localStorage.getItem('ui_theme') as Theme
+if (savedTheme && appStore.themes[savedTheme]) {
+  appStore.applyTheme(savedTheme)
 }
 
-// 监听状态更新
-if (window.electronAPI) {
-  window.electronAPI.on('bot:status-update', (data) => {
-    if (data && typeof data.connected === 'boolean') {
-      connected.value = data.connected
-    }
-  })
-  
-  window.electronAPI.on('bot:notifications-updated', async () => {
-    try {
-      const res = await getNotifications()
-      if (res.success) {
-        unreadCount.value = res.unreadCount
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  })
-}
-
-onMounted(async () => {
-  try {
-    const res = await getNotifications()
-    if (res.success) {
-      unreadCount.value = res.unreadCount
-    }
-  } catch (e) {
-    // ignore
-  }
+onMounted(() => {
+  appStore.fetchTheme()
 })
 </script>
 
-<style scoped>
-.app-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background-color: var(--bg-primary);
+<template>
+  <div class="h-screen w-full overflow-hidden app-root" :style="{ color: 'var(--theme-text)' }">
+    <RouterView />
+    <ToastContainer />
+  </div>
+</template>
+
+<style>
+/* Global styles */
+body {
+  margin: 0;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--app-bg);
+  color: var(--theme-text);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
-.main-layout {
-  display: flex;
-  flex: 1;
+/* Color theme variables */
+:root {
+  --theme-bg: #f8fafc;
+  --theme-text: #172033;
+  --theme-primary: #3b82f6;
+  --theme-secondary: #2563eb;
+  --theme-gradient: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  --app-bg: linear-gradient(180deg, #f6f8fb 0%, #eef3f8 100%);
+  --surface-1: color-mix(in srgb, var(--theme-bg) 8%, #ffffff);
+  --surface-2: color-mix(in srgb, var(--theme-bg) 22%, #ffffff);
+  --surface-3: color-mix(in srgb, var(--theme-bg) 40%, #ffffff);
+  --surface-border: rgba(15, 23, 42, 0.09);
+  --surface-border-strong: rgba(15, 23, 42, 0.14);
+  --surface-shadow: 0 16px 45px rgba(15, 23, 42, 0.08);
+  --surface-shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.06);
+  --muted-text: #64748b;
+  --input-bg: rgba(255, 255, 255, 0.84);
+  --panel-glow: color-mix(in srgb, var(--theme-primary) 14%, transparent);
+}
+
+.dark {
+  --app-bg: radial-gradient(circle at top left, color-mix(in srgb, var(--theme-primary) 16%, transparent) 0, transparent 28rem), linear-gradient(180deg, #0b1020 0%, color-mix(in srgb, var(--theme-bg) 74%, #020617) 100%);
+  --surface-1: color-mix(in srgb, var(--theme-bg) 72%, #ffffff 9%);
+  --surface-2: color-mix(in srgb, var(--theme-bg) 78%, #ffffff 6%);
+  --surface-3: color-mix(in srgb, var(--theme-bg) 84%, #ffffff 4%);
+  --surface-border: rgba(255, 255, 255, 0.09);
+  --surface-border-strong: rgba(255, 255, 255, 0.14);
+  --surface-shadow: 0 18px 55px rgba(0, 0, 0, 0.34);
+  --surface-shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.24);
+  --muted-text: #9ca3af;
+  --input-bg: rgba(15, 23, 42, 0.54);
+  --panel-glow: color-mix(in srgb, var(--theme-primary) 18%, transparent);
+}
+
+.app-root {
+  background: var(--app-bg);
+}
+
+/* SaaS surface system */
+.bg-white {
+  background-color: var(--surface-1) !important;
+}
+
+.dark .bg-gray-800,
+.dark .bg-gray-900 {
+  background-color: var(--surface-1) !important;
+}
+
+.bg-gray-50 {
+  background-color: var(--surface-2) !important;
+}
+
+.dark .bg-gray-700 {
+  background-color: var(--surface-3) !important;
+}
+
+.ui-card {
+  border: 1px solid var(--surface-border);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-1) 96%, #ffffff 4%), var(--surface-1));
+  box-shadow: var(--surface-shadow-soft);
+}
+
+.ui-card-elevated {
+  border: 1px solid var(--surface-border);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-1) 92%, #ffffff 8%), var(--surface-1));
+  box-shadow: var(--surface-shadow);
+}
+
+.ui-subtle-panel {
+  border: 1px solid var(--surface-border);
+  background: color-mix(in srgb, var(--surface-2) 86%, transparent);
+}
+
+.glass-panel {
+  border: 1px solid var(--surface-border);
+  background: color-mix(in srgb, var(--surface-1) 60%, transparent);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--surface-shadow-soft);
+}
+
+.metric-card {
+  position: relative;
   overflow: hidden;
 }
 
-.sidebar {
-  width: 72px;
-  background-color: var(--bg-sidebar);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 12px;
-  flex-shrink: 0;
-}
-
-.nav-items {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
-}
-
-.nav-item {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin: 0 auto;
-}
-
-.nav-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.nav-item.active {
-  background: var(--color-accent);
-}
-
-.nav-icon-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.nav-icon {
-  font-size: 20px;
-}
-
-.nav-badge {
+.metric-card::before {
+  content: "";
   position: absolute;
-  top: -2px;
-  right: -2px;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, var(--panel-glow), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 34%);
+}
+
+.metric-card > * {
+  position: relative;
+}
+
+.shadow,
+.shadow-sm,
+.shadow-md {
+  box-shadow: var(--surface-shadow-soft) !important;
+}
+
+/* Use CSS variables for theme colors */
+.btn-primary {
+  background: var(--theme-gradient);
+  border-color: var(--theme-primary);
+}
+
+.btn-primary:hover {
+  background: var(--theme-secondary);
+}
+
+.text-primary {
+  color: var(--theme-primary);
+}
+
+.bg-primary {
+  background-color: var(--theme-primary);
+}
+
+.border-primary {
+  border-color: var(--theme-primary);
+}
+
+.bg-gradient-primary {
+  background: var(--theme-gradient);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
   width: 8px;
   height: 8px;
-  background-color: #f56c6c;
-  border-radius: 50%;
-  border: 1px solid var(--bg-sidebar);
 }
 
-.sidebar-bottom {
-  padding: 16px 0;
-  display: flex;
-  justify-content: center;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.status-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  transition: background 0.3s;
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--theme-primary) 50%, #94a3b8);
+  border-radius: 999px;
 }
 
-.status-dot.online {
-  background: var(--color-success);
-  box-shadow: 0 0 6px var(--color-success);
-}
-
-.status-dot.offline {
-  background: var(--color-danger);
-  box-shadow: 0 0 6px var(--color-danger);
-}
-
-.content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px;
-}
-
-.titlebar {
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--bg-sidebar);
-  -webkit-app-region: drag;
-}
-
-.titlebar-title {
-  font-size: 13px;
-  color: var(--color-text-secondary);
+::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-secondary);
+  opacity: 0.8;
 }
 </style>

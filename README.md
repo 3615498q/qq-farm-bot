@@ -1,239 +1,283 @@
-<div align="center">
+> 📦 **Go 重写版（单文件二进制 · 免 Node 环境）已发布，欢迎测试！**
+>
+> 不想折腾 Node 环境的同学，可以直接用 Go 重写版源码编译出单文件二进制使用。
+> 仓库地址：https://github.com/Aoluis1005/QQ-farm-BOT-GO
+> 测试过程中遇到问题、建议或 Bug，请到该仓库提 **Issue**。
+>
+> ⚠️ 测试版可能存在 Bug，请提 Issue 反馈；不含后台 / 卡密系统，仅限个人自用。
 
-# QQ经典农场助手
+# QQ Farm Bot Private
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Node.js](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen.svg)](https://nodejs.org/)
-[![Vue](https://img.shields.io/badge/vue-3.x-4FC08D.svg)](https://vuejs.org/)
+> 🆓 **本项目完全免费 · 开源共享 · 拒绝一切收费**
+>
+> 本项目是**完全免费、开源**的 QQ 农场多账号挂机工具维护分支，**不收取任何费用**，也从未设置任何付费门槛或 VIP 限制。
+>
+> **关于倒卖 / 收费（请注意）**：任何「付费购买源码」「收费代部署」「付费授权」「倒卖牟利」等行为**均与作者本人无关**，并非作者所为。作者**从未授权**任何第三方以任何形式向他人收费或牟利。若你是通过付费渠道获取本项目，请知悉该费用与作者无关；因倒卖、转售造成的任何损失、账号风险或纠纷，作者概不负责。
 
-**基于 NodeJS + Vue 3 的 QQ/微信经典农场小程序自动化脚本**
+> 私有维护仓库。此仓库用于 QQ 农场多账号挂机工具的重构版源码维护，不包含运行时账号数据、用户数据和日志。
 
-通过分析小程序 WebSocket 通信协议（Protocol Buffers），实现全自动农场管理
+## 简介
 
-支持 **扫码登录** · 智能种植策略 · 好友互动 · 任务系统 · 实时日志
+这是一个基于 Node.js 的 QQ 农场自动化工具，提供多账号管理、Web 控制面板、实时日志、数据统计、好友管理、活动、商城、图鉴和后台管理等功能。
 
-[功能特性](#功能特性) · [快速开始](#安装) · [使用文档](#使用方式) · [技术栈](#技术栈)
+当前仓库定位为 `2.3.x` 重构维护版，重点是整理前后端结构、降低维护成本，并保留已有核心功能。
 
-</div>
+> **派生说明**：本仓库是在 [cwser/qq-farm-bot-private](https://github.com/cwser/qq-farm-bot-private) 基础上进行的**二次修改（二改）**维护分支，在其版本之上增加了多账号 Worker 模型、Vue 3 控制面板重构、ACE 安全链路等内容。更早的上游原始项目见下方「特别感谢」。
 
----
+维护信息：
 
-> **💡 项目说明**
-> 本项目融合了多个优秀开源项目的功能，本项目基于[linguo2625469/qq-farm-bot](https://github.com/MoeGrid/qq-farm-bot) 进行重构和功能增强，集成了 [MoeGrid/qq-farm-bot](https://github.com/MoeGrid/qq-farm-bot) 的vue3前端界面设计、[12zyhh/qq-farm-bot](https://github.com/12zyhh/qq-farm-bot) 的页面功能加强以及 [lkeme/QRLib](https://github.com/lkeme/QRLib) 的扫码登录功能，提供更完整、便捷的自动化体验。
+- 仓库：`Aoluis1005/qq-farm-bot`
+- 维护分支：`main`
+- 完整更新日志参考：[QQ 农场更新日志](https://github.com/Aoluis1005/qq-farm-bot/blob/main/UPDATE_README.md)
 
-## 📸 应用截图
+> **注意**：本仓库为基于 [cwser/qq-farm-bot-private](https://github.com/cwser/qq-farm-bot-private) 的二改维护分支（原作者/上游信息见「特别感谢」）。以下所有功能与配置均以本仓库为准。
 
-<table>
-<tr>
-<td width="50%">
-<img src="docs/images/首页.png" alt="首页" />
-<p align="center"><b>首页 - 扫码登录与状态监控</b></p>
-<p align="center">支持扫码直接登录，实时显示农场状态、经验金币</p>
-</td>
-<td width="50%">
-<img src="docs/images/参数配置.png" alt="参数配置" />
-<p align="center"><b>设置页 - 参数配置</b></p>
-<p align="center">自定义巡查间隔、平台选择，查看所有可种植作物效率排行</p>
-</td>
-</tr>
+## 当前状态
 
-</table>
+- 后端：Node.js / CommonJS / Express / Socket.IO
+- 前端：Vue 3 / Vite / TypeScript / Pinia / UnoCSS（**全新重构 UI**）
+- 包管理：pnpm workspace
+- 部署：源码运行、Docker、二进制打包
+- 默认面板端口：`3007`
+- 默认管理员账号：`admin`
+- 默认管理员密码：`admin`
 
-## 📝 更新日志
+部署后请立即修改默认密码。
 
-详见 [CHANGELOG.md](CHANGELOG.md)
+## ✨ 全新 UI 与核心特点
 
-## ✨ 功能特性
+<p align="center">
+  <img src="assets/screenshots/01-overview-dark.jpg" width="32%" alt="首页概览（深色）" />
+  <img src="assets/screenshots/02-career-modal.jpg" width="32%" alt="点击头像弹个人生涯" />
+  <img src="assets/screenshots/03-activity-guanxing.jpg" width="32%" alt="活动中心观星礼录" />
+</p>
 
-<table>
-<tr>
-<td width="50%">
+<p align="center">
+  <img src="assets/screenshots/05-login-dark.jpg" width="55%" alt="登录页（夜间主题）" />
+</p>
 
-### 🔑 登录与连接
-- ✅ **扫码登录** — 支持手机QQ扫码直接登录（新增！）
-- ✅ **Code登录** — 支持手动输入 Code 登录（兼容旧方式）
-- ✅ **心跳保活** — 自动维持 WebSocket 连接
-- ✅ **双平台支持** — QQ 和微信小程序均可使用
+本仓库前端已用 **Vue 3 + Vite + TypeScript + UnoCSS** 完全重构，相比原版面板在交互、信息密度和移动端适配上都有质的提升。核心亮点：
 
-### 🌱 自己农场
-- ✅ **自动收获** — 检测成熟作物并自动收获
-- ✅ **自动铲除** — 自动铲除枯死/收获后的作物残留
-- ✅ **智能种植** — 三种策略可选
-  - 🚀 快速升级（经验效率最优）
-  - 🌟 高级作物（单次经验最高）
-  - 🎯 手动选择（自定义种植）
-- ✅ **自动施肥** — 种植后自动施放普通肥料加速生长
-- ✅ **自动除草** — 检测并清除杂草
-- ✅ **自动除虫** — 检测并消灭害虫
-- ✅ **自动浇水** — 检测缺水作物并浇水
+- **全新控制面板**：统一亮 / 暗双主题，全局毛玻璃质感，移动端 / 桌面端自适应，操作更顺手。
+- **点击头像弹个人生涯**：在概览页点击微信头像，即可弹出「个人生涯」面板，展示头像 / 昵称 / 等级 / 经验 / 角色编号，以及「历史累计收获」「累计摘取好友作物」统计与收获明细网格（含前三名标牌）。
+- **首页概览**：一屏掌握所有账号状态、今日统计卡片、一键启动 / 停止，常用操作无需层层点进。
+- **全局悬浮导航栏（FloatingDock）**：底部常驻悬浮导航，随时打开添加账号、切换账号、快速跳转，不必回退到菜单。
+- **账号随时切换**：右上角菜单与悬浮导航均支持在已登录账号间无缝切换，无需退出重登。
+- **实时日志与多账号 Worker**：每个账号独立 Worker，实时日志流、离线自动重连、应用宝（yyb-go）内置扫码登录，开箱即用。
+- **活动 / 商城 / 图鉴 / 好友 / 后台**等能力一应俱全，并持续打磨中。
 
-</td>
-<td width="50%">
+> **积极维护 · 有 Bug 随时反馈**：本项目长期积极维护。使用中遇到任何问题、Bug 或想提建议，请直接到本仓库 **Issues** 反馈，作者看到后会**第一时间修复**。也欢迎 PR。
 
-### 👥 好友农场
-- ✅ **好友巡查** — 自动巡查好友农场（主开关）
-- ✅ **帮忙操作** — 帮好友浇水/除草/除虫（有经验上限）
-- ✅ **自动偷菜** — 偷取好友成熟作物（有经验）
+## 技术栈
 
-### ⚙️ 系统功能
-- ✅ **自动任务** — 自动领取完成的任务奖励
-- ✅ **自动同意好友** — 微信同玩好友申请自动同意
-- ✅ **邀请码处理** — 启动时自动处理邀请链接
-- ✅ **实时状态更新** — 经验/金币/等级实时显示
-- ✅ **消息通知** — 游戏内消息通知系统
+**后端**
 
-</td>
-</tr>
-</table>
+[<img src="https://skillicons.dev/icons?i=nodejs" height="48" title="Node.js 20+" />](https://nodejs.org/)
+[<img src="https://skillicons.dev/icons?i=express" height="48" title="Express 4" />](https://expressjs.com/)
+[<img src="https://skillicons.dev/icons?i=socketio" height="48" title="Socket.IO 4" />](https://socket.io/)
 
-### 🎨 桌面应用特性
+**前端**
 
-- 🖥️ **现代化界面** — Vue 3 + Element Plus 暗色主题
-- 🎛️ **功能开关** — 每个功能可独立开启/关闭，带详细说明
-- 📊 **实时日志** — 查看所有操作记录，支持筛选
-- ⚡ **配置持久化** — 自动保存配置，下次启动自动应用
+[<img src="https://skillicons.dev/icons?i=vue" height="48" title="Vue 3" />](https://vuejs.org/)
+[<img src="https://skillicons.dev/icons?i=vite" height="48" title="Vite 7" />](https://vitejs.dev/)
+[<img src="https://skillicons.dev/icons?i=ts" height="48" title="TypeScript 5" />](https://www.typescriptlang.org/)
+[<img src="https://cdn.simpleicons.org/pinia/FFD859" height="48" title="Pinia 3" />](https://pinia.vuejs.org/)
+[<img src="https://skillicons.dev/icons?i=unocss" height="48" title="UnoCSS" />](https://unocss.dev/)
 
-## 📦 安装
+**部署**
 
-### 环境要求
+[<img src="https://skillicons.dev/icons?i=pnpm" height="48" title="pnpm 10" />](https://pnpm.io/)
+[<img src="https://skillicons.dev/icons?i=docker" height="48" title="Docker" />](https://www.docker.com/)
 
-- Node.js >= 16.0.0
-- npm 或 pnpm
+## 环境要求
 
-### 克隆仓库
+- Node.js 20+
+- pnpm，推荐通过 `corepack enable` 启用
+- Docker，可选，仅 Docker 部署时需要
 
-```bash
-git clone https://github.com/Hygge9/qq-farm-bot.git
+## 快速启动
+
+```powershell
+git clone https://github.com/Aoluis1005/qq-farm-bot.git
 cd qq-farm-bot
+
+corepack enable
+pnpm install
+pnpm build:web
+pnpm dev:core
 ```
 
-## � 使用方式
+启动后访问：
 
-### 1. 启动项目
+- 本机：`http://localhost:3007`
+- 局域网：`http://<你的IP>:3007`
+
+如需修改端口：
+
+```powershell
+$env:ADMIN_PORT="你的新端口"
+pnpm dev:core
+```
+
+## Docker 部署
+
+> **应用宝（yyb-go）已内置**：自本版本起，官方 `docker compose up -d --build` 构建的镜像**已包含应用宝 Go 服务（yyb-go）**，与 Node 主服务运行在**同一容器、共用 3007 端口**。Node 会把 `/api/yyb/*` 自动代理到容器内 yyb-go，你**无需再单独部署或填写应用宝接口地址**。若未显式设置 `YYB_API_TOKEN`，容器首次启动会**自动生成并持久化**一个 Token（同时作为 yyb-go 的 Bearer 鉴权与 Node 代理转发 Token），前端「应用宝」配置页自动预填，做到开箱即用；你也可以手动设置 `YYB_API_TOKEN` 覆盖默认值。
+>
+> **注意**：二进制发布版（exe）与纯源码运行**不包含** yyb-go，仍需自行部署该 Go 服务并填写接口地址。
 
 ```bash
-# 1. 安装依赖 (如果尚未安装)
-npm install
+git clone https://github.com/Aoluis1005/qq-farm-bot.git
+cd qq-farm-bot
 
-# 2. 打包web页面
-npm run build
-
-# 3. 启动后台服务
-npm run serve
+docker compose up -d --build
+docker compose logs -f
 ```
 
-启动后访问：`http://localhost:3000`
+停止并移除容器：
 
-### 2. 登录账号
-
-#### 方式一：扫码登录 (推荐)
-1. 在首页点击「扫码登录」标签
-2. 使用手机 QQ 扫描屏幕上的二维码
-3. 在手机上确认登录
-4. 系统将自动获取凭证并连接
-
-#### 方式二：手动 Code 登录
-如果扫码登录遇到问题，可以使用传统的抓包方式：
-<details>
-<summary><b>点击查看抓包教程（Fiddler）</b></summary>
-
-1. 手机安装 Fiddler 证书，配置代理指向电脑
-2. 电脑打开 Fiddler，开启 HTTPS 解密
-3. 手机打开 QQ/微信 → 进入「经典农场」小程序
-4. 在 Fiddler 中筛选请求，找到 WebSocket 连接或登录请求中的 `code` 参数
-5. 复制 code 值，粘贴到本工具「Code 登录」输入框中使用
-
-> **💡 提示**：code 具有时效性，短时间内断开重连可复用同一 code，过期后需重新进入小程序获取。
-
-</details>
-
-## 📁 项目结构
-
-<details>
-<summary><b>点击展开查看详细结构</b></summary>
-
-```
-qq-farm-bot/
-├── server/            # NodeJS 后端服务
-│   ├── lib/           # 登录库 (QRLib 移植)
-│   ├── login.js       # 登录逻辑
-│   └── ...
-├── web/               # Vue 3 前端界面
-├── src/               # 核心业务模块
-├── proto/             # Protobuf 协议定义
-├── gameConfig/        # 游戏配置数据
-└── docs/              # 项目文档
+```bash
+docker compose down
 ```
 
-</details>
+Docker 部署修改版本号或配置后，建议重新构建容器：
 
-## ⚙️ 配置说明
+```bash
+docker compose down
+docker compose up -d --build
+```
 
-配置通过界面操作，自动保存到当前目录（`config.json`）：
+## 二进制发布版
 
-- **平台选择**：QQ / 微信
-- **种植模式**：
-  - 🚀 快速升级（经验效率最优，适合快速升级）
-  - 🌟 高级作物（单次经验最高，适合高等级玩家）
-  - 🎯 手动选择（自定义种植作物）
-- **巡查间隔**：自己农场 / 好友农场分别设置
-- **功能开关**：每个自动化功能可独立开启/关闭，带详细说明
+构建：
 
-## ⚠️ 注意事项
+```bash
+pnpm install
+pnpm package:release
+```
 
-- ⏱️ code 具有时效性，扫码登录通常更方便，过期后只需重新扫码即可
-- 🔐 同一账号同时只能在一个地方登录，启动本工具后小程序端会被踢下线
-- 🌐 建议在稳定的网络环境下运行
-- 📚 本项目仅供学习交流使用
+产物输出在 `dist/` 目录。
 
-## 🛠️ 技术栈
+| 平台 | 文件名 |
+| --- | --- |
+| Windows x64 | `qq-farm-bot.exe` |
+| Linux x64 | `qq-farm-bot` |
+| macOS Intel | `qq-farm-bot-x64` |
+| macOS Apple Silicon | `qq-farm-bot-arm64` |
 
-<table>
-<tr>
-<td align="center" width="20%">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="48" height="48" alt="Node.js" />
-<br />Node.js
-</td>
-<td align="center" width="20%">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg" width="48" height="48" alt="Vue 3" />
-<br />Vue 3
-</td>
-<td align="center" width="20%">
-<img src="https://element-plus.org/images/element-plus-logo.svg" width="48" height="48" alt="Element Plus" />
-<br />Element Plus
-</td>
-</tr>
-</table>
+运行：
 
-## 🤝 贡献
+```bash
+# Windows：双击 exe 或在终端执行
+.\qq-farm-bot-win-x64.exe
 
-欢迎提交 Issue 和 Pull Request！
+# Linux / macOS
+chmod +x ./qq-farm-bot
+./qq-farm-bot
+```
 
-## 📄 License
+程序会在可执行文件同级目录自动创建 `data/`，用于保存账号、用户、日志和缓存等运行时数据。
 
-[MIT](LICENSE)
+## 登录与安全
 
-## 🙏 致谢
+- 面板首次访问需要登录
+- 默认管理员账号：`admin`
+- 默认管理员密码：`admin`
+- 部署后请立即修改默认密码
+- 不要把运行时数据、账号文件、日志或 `.env` 文件提交到仓库
 
-本项目融合了以下优秀开源项目的功能，特此感谢原作者的贡献：
+## 应用宝接口配置（重要）
 
-1.  **[MoeGrid/qq-farm-bot](https://github.com/MoeGrid/qq-farm-bot)**
-    *   提供了现代化的 Vue 3 前端界面设计、Web 版架构改造。
-2.  **[12zyhh/qq-farm-bot](https://github.com/12zyhh/qq-farm-bot)**
-    *   提供了功能增强。
-3.  **[lkeme/QRLib](https://github.com/lkeme/QRLib)**
-    *   提供了强大的 QQ 扫码登录协议实现，使得本项目能够支持便捷的扫码登录功能。
+应用宝登录 / 离线重连依赖一个**应用宝接口服务**（提供 `wxapp/getCode` 等能力）。添加账号时填写的「接口地址」和「API Token」**必须换成你自己的**：
 
-感谢所有为开源社区做出贡献的开发者！
+- **接口地址**：**不预填**，请填写你自己部署的接口服务地址（格式如 `http://你的服务器:端口/wxapp/getCode`）。
+- **API Token**：**不预填**，需要你自行申请/填写自己的 Token，不要使用他人或示例值。
+- 离线自动重连、扫码登录等能力均依赖该接口可用；接口不可用或 Token 失效时需重新填写。
+- 添加账号弹窗中，应用宝相关有两个并列标签页：「应用宝」（填写接口地址/Token、选择已有账号登录、配置离线重连）与「应用宝扫码」（扫码添加新账号）。两者共用同一份接口配置，先填好「应用宝」再切到「应用宝扫码」即可。
 
----
+> **Docker 部署用户**：无需自备应用宝接口服务——镜像已内置 yyb-go（见上方「Docker 部署」说明），设置 `YYB_API_TOKEN` 即可直接使用应用宝登录。
+> **非 Docker 部署用户**（二进制 / 源码运行）：如果你没有自己的应用宝接口服务，应用宝登录功能将无法使用，可改用其他登录方式。
 
-<div align="center">
+## 数据与隐私
 
-### 📊 Star History
+以下内容已通过 `.gitignore` 排除，不应提交到仓库：
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Hygge9/qq-farm-bot&type=Date)](https://star-history.com/#Hygge9/qq-farm-bot&Date)
+- `core/data/`
+- `node_modules/`
+- `web/dist/`
+- `.env`
+- `.env.*`
+- `*.log`
+- `logs/`
+- `tmp/`
 
-**如果觉得项目不错，请点个 ⭐️ Star 支持一下！**
+`core/data/` 会在运行时自动生成，可能包含账号、用户、登录日志、好友缓存、统计数据和其他敏感信息。备份或迁移服务器时可以单独处理该目录，但不要提交到 GitHub。
 
-</div>
+## 项目结构
+
+```text
+qq-farm-bot-private/
+├── core/                  # 后端（Node.js 机器人引擎）
+│   ├── src/
+│   │   ├── config/        # 配置管理
+│   │   ├── controllers/   # HTTP API
+│   │   ├── gameConfig/    # 游戏静态数据
+│   │   ├── models/        # 数据模型与持久化
+│   │   ├── proto/         # Protobuf 协议定义
+│   │   ├── runtime/       # 运行时引擎与 Worker 管理
+│   │   └── services/      # 业务逻辑（农场、好友、任务等）
+│   └── client.js          # 后端入口
+├── web/                   # 前端（Vue 3 + Vite）
+│   ├── src/
+│   │   ├── api/           # API 客户端
+│   │   ├── components/    # Vue 组件
+│   │   ├── stores/        # Pinia 状态管理
+│   │   └── views/         # 页面视图
+├── docker-compose.yml
+├── pnpm-workspace.yaml
+└── package.json
+```
+
+## 常用命令
+
+```bash
+# 安装依赖
+pnpm install
+
+# 构建前端
+pnpm build:web
+
+# 启动后端和面板
+pnpm dev:core
+
+# 前后端检查
+pnpm lint
+
+# 打包发布版
+pnpm package:release
+```
+
+## 维护说明
+
+- 只提交源码、配置、锁文件、静态资源和文档。
+- 不提交 `core/data/`、依赖目录、构建产物或本地日志。
+- 更新功能前优先确认是可见功能、隐藏功能、内部能力还是休眠能力。
+- 前端大页面逐步拆分到 `components/`、`composables/` 和 `stores/`。
+- 后端入口只保留 wiring，具体接口逻辑优先下沉到领域路由、helper 或 service。
+- 中文显示异常时先确认文件真实 UTF-8 内容，不要只按终端乱码判断。
+
+## 特别感谢
+
+- **本仓库基于 [cwser/qq-farm-bot-private](https://github.com/cwser/qq-farm-bot-private) 二改**（在此版本基础上进行修改，是其下游维护分支）
+- 基于 [Penty-d/qq-farm-bot-ui](https://github.com/Penty-d/qq-farm-bot-ui) 二改
+- 核心功能：[linguo2625469/qq-farm-bot](https://github.com/linguo2625469/qq-farm-bot)
+- 部分功能：[QianChenJun/qq-farm-bot](https://github.com/QianChenJun/qq-farm-bot)
+- 扫码登录：[lkeme/QRLib](https://github.com/lkeme/QRLib)
+- 推送通知：[imaegoo/pushoo](https://github.com/imaegoo/pushoo)
+
+## 免责声明
+
+本项目仅供学习与研究用途。使用本工具可能违反游戏服务条款，由此产生的一切后果由使用者自行承担。
+
+- **关于倒卖**：本项目为开源学习项目，**任何付费倒卖、商业售卖、付费代部署、收费授权等行为均与作者无关**。作者从未授权任何第三方以任何形式向他人收费或牟利。若你通过付费渠道获取本项目，请知悉该费用与作者无关，因倒卖、二次转售造成的损失、账号风险或纠纷，作者不承担任何责任。
+- **关于源码**：本仓库为二改维护分支，基于上游项目修改而来，相关版权与致谢见「特别感谢」。请遵守上游项目的开源协议。
+- **风险自担**：部署、使用本项目产生的任何封号、数据丢失、法律或其他后果，均由使用者自行承担，作者不作任何担保。
